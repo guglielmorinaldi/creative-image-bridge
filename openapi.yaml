@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: Creative Image Bridge REST API
+  version: 1.0.0
+  description: REST companion to the Creative Image Bridge MCP server.
+servers:
+  - url: https://YOUR-DOMAIN.example
+security:
+  - BridgeKey: []
+components:
+  securitySchemes:
+    BridgeKey:
+      type: apiKey
+      in: header
+      name: x-bridge-key
+  schemas:
+    GenerateRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt: { type: string }
+        model: { type: string, enum: [gpt-image-2.5-flare, gpt-image-2.5-sunburst] }
+        quality: { type: string, enum: [auto, low, medium, high, xhigh, max] }
+        background: { type: string, enum: [auto, opaque, transparent] }
+        output_format: { type: string, enum: [png, jpeg, webp] }
+        final_width: { type: integer }
+        final_height: { type: integer }
+        post_process_mode: { type: string, enum: [cover, contain, blur-extend] }
+        n: { type: integer, minimum: 1, maximum: 4 }
+        label: { type: string }
+    EditRequest:
+      type: object
+      required: [prompt, asset_ids]
+      properties:
+        prompt: { type: string }
+        asset_ids: { type: array, items: { type: string }, minItems: 1, maxItems: 10 }
+        mask_asset_id: { type: string }
+        model: { type: string, enum: [gpt-image-2.5-flare, gpt-image-2.5-sunburst] }
+        quality: { type: string, enum: [auto, low, medium, high, xhigh, max] }
+        background: { type: string, enum: [auto, opaque, transparent] }
+        output_format: { type: string, enum: [png, jpeg, webp] }
+        final_width: { type: integer }
+        final_height: { type: integer }
+        post_process_mode: { type: string, enum: [cover, contain, blur-extend] }
+        label: { type: string }
+paths:
+  /health:
+    get:
+      security: []
+      operationId: health
+      summary: Health check
+      responses:
+        '200': { description: OK }
+  /api/assets:
+    get:
+      operationId: listAssets
+      summary: List Asset Vault images
+      responses: { '200': { description: OK } }
+    post:
+      operationId: uploadAsset
+      summary: Upload an image as base64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filename, data_base64]
+              properties:
+                filename: { type: string }
+                mime_type: { type: string }
+                data_base64: { type: string }
+                label: { type: string }
+                tags: { type: array, items: { type: string } }
+      responses: { '201': { description: Created } }
+  /api/outputs:
+    get:
+      operationId: listOutputs
+      summary: List generated outputs
+      responses: { '200': { description: OK } }
+  /api/generate:
+    post:
+      operationId: generateImage
+      summary: Generate an image
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GenerateRequest' }
+      responses: { '200': { description: Generated } }
+  /api/edit:
+    post:
+      operationId: editImage
+      summary: Edit/generate from Asset Vault references
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditRequest' }
+      responses: { '200': { description: Generated } }

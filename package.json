@@ -1,0 +1,21 @@
+{
+  "name": "creative-image-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Remote MCP + REST bridge for Claude/AI orchestrators to generate and edit campaign visuals with OpenAI GPT Image.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node --check src/openai-images.js && node --check src/storage.js && node --check src/image-sizes.js && node --check src/ui.js",
+    "test:sizes": "node scripts/test-sizes.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/node": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.2.0",
+    "sharp": "^0.34.4",
+    "zod": "^4.1.11"
+  }
+}

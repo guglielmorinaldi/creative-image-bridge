@@ -1,0 +1,12 @@
+services:
+  creative-image-bridge:
+    build: .
+    ports:
+      - "8787:8787"
+    env_file:
+      - .env
+    volumes:
+      - creative_image_data:/data
+    restart: unless-stopped
+volumes:
+  creative_image_data:
